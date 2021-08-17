@@ -1,3 +1,6 @@
 frontend/node_modules
 frontend/.idea
+frontend/.DS_store
 backend/node_modules
+backend/.DS_store
+.DS_store
