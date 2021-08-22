@@ -5,6 +5,12 @@ const express = require('express');
 // extraction de l'objet JSON de la demande
 const bodyParser= require('body-parser');
 
+// création des constantes pour importer les routes créées
+const sauceRoutes = require('./routes/sauces');
+const userRoutes = require('./routes/user');
+
+const path = require('path');
+
 //package pour faciliter les interaction avec MongoDB
 // import du package
 const mongoose = require('mongoose');
@@ -31,23 +37,14 @@ app.use((req, res, next) =>{
     next();
 });
 
+app.use('/images', express.static(path.join(__dirname, 'images')));
+
+// transforme les données des requetes post en json
 app.use(bodyParser.json());
 
-
-app.use((req, res, next) =>{
-    res.status(201);
-    next();
-});
-
-
-app.use((req, res, next) =>{
-    res.json({message: 'Votre requête a bien été recue'});
-    next();
-});
-
-app.use((req, res) =>{
-    console.log('Réponse envoyée avec succès');
-});
-
+// utilisation des routes vers les sauces
+app.use('/api/sauces', sauceRoutes);
+// utilisation des routes vers les users
+app.use('/api/user', userRoutes);
 
 module.exports = app;
