@@ -37,6 +37,7 @@ app.use((req, res, next) =>{
     next();
 });
 
+
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 // transforme les données des requetes post en json
@@ -45,6 +46,6 @@ app.use(bodyParser.json());
 // utilisation des routes vers les sauces
 app.use('/api/sauces', sauceRoutes);
 // utilisation des routes vers les users
-app.use('/api/user', userRoutes);
+app.use('/api/auth', userRoutes);
 
 module.exports = app;

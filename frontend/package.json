@@ -11,11 +11,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@angular/cli": "^12.2.2",
+    "@angular/cli": "^7.0.2",
     "@angular/core": "^12.2.2",
     "concurrently": "^5.2.0",
     "http-server": "^13.0.1",
     "live-server": "^1.1.0",
+    "node-sass": "^6.0.1",
     "rxjs": "^7.3.0"
   },
   "devDependencies": {
