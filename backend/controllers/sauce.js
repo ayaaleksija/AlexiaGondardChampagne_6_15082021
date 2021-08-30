@@ -57,15 +57,98 @@ exports.modifySauce = (req, res, next) => {
 
 // suppression d'une sauce
 exports.deleteSauce = (req, res, next) => {
-    Sauce.findOne({ _id : req.params.id })
-    .then(sauce => {
-      const filename = sauce.imageUrl.split("/images/")[1]
-      fs.unlink(`images/${filename}`, () => {
-        Sauce.deleteOne({_id : req.params.id})
-    .then(res.status(200).json({ message: "Sauce supprimée" }))
-    .catch(error => res.status(400).json({ error }))
+    Sauce.findOne({ _id: req.params.id }) 
+        .then((sauce) => {
+            const filename = sauce.imageUrl.split("/images/")[1];
+            fs.unlink(`images/${filename}`, () => {
+                Sauce.deleteOne({ _id: req.params.id }) 
+                    .then(() => res.status(200).json({ message: `Sauce supprimée !` }))
+                    .catch((error) => res.status(500).json({ error }));
+            });
+        })
+        .catch((error) => res.status(500).json({ error }));
+};
+
+
+// mise en place du like/dislike des sauces
+exports.likeDislikeSauce = (req, res, next) => {
+    // création des constantes 
+    const userId = req.body.userId;
+    const sauceId = req.params.id;
+    const like = req.body.like;
+
+        //Définit le statut de like (1,-1,0,defaut)
+        switch (like) {
+
+            // cas ou l'utilisateur change d'avis
+            case 0:
+                Sauce.findOne({ _id: sauceId })
+                    .then((sauce) => {
+                        if (sauce.usersLiked.includes(userId)) {
+                            Sauce.updateOne(
+                                { _id: sauceId },
+                                {
+                                    // décrémentation du like
+                                    $inc: { likes: -1 },
+                                    // suppression de l'user dans le tableau
+                                    $pull: { usersLiked: userId }, 
+                                }
+                            )
+                                .then(() => {res.status(201).json({ message: `like supprimé` });
+                                })
+                                .catch((error) => res.status(500).json({ error }));
+                        }
+                        if (sauce.usersDisliked.includes(userId)) {
+                            Sauce.updateOne(
+                                { _id: sauceId },
+                                {
+                                    //décrémentation du dislike
+                                    $inc: { dislikes: -1 }, 
+                                    // suppression de l'user dans le tableau
+                                    $pull: { usersDisliked: userId },
+                                }
+                            )
+                                .then(() =>res.status(201).json({ message: `dislike supprimé` })
+                                )
+                                .catch((error) => res.status(500).json({ error }));
+                        }
+                    })
+                    .catch((error) => res.status(500).json({ error }));
+                break;
+
+            // cas ou l'utilisateur aime la sauce        
+            case 1: 
+                Sauce.updateOne(
+                    { _id: sauceId },
+                    {
+                        // invrémentation des likes
+                        $inc: { likes: 1 },
+                        // ajout de l'utilisateur qui a like au tableau
+                        $push: { usersLiked: userId }, 
+                    }
+                )
+                    .then(() =>res.status(201).json({ message: `J'aime!` })
+                    )
+                    .catch((error) => res.status(500).json({ error }));
+                break;
+
+            // cas ou l'utilisateur n'aime pas la sauce        
+            case -1: 
+                Sauce.updateOne(
+                    { _id: sauceId },
+                    {
+                        // invrémentation des dislikes
+                        $inc: { dislikes: 1 }, 
+                        // ajout de l'utilisateur qui a dislike au tableau 
+                        $push: { usersDisliked: userId }, 
+                    }
+                )
+                    .then(() =>res.status(201).json({ message: `Je n'aime pas!` })
+                    )
+                    .catch((error) => res.status(500).json({ error }));
+                break;
     
-      })
-    })
-    .catch(error => res.status(500).json({ error }))
-  }
+            default:
+                return res.status(400).json({ message: "Bad request"});
+            }
+        };

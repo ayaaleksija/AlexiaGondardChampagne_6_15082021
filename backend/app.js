@@ -9,6 +9,7 @@ const bodyParser= require('body-parser');
 const sauceRoutes = require('./routes/sauces');
 const userRoutes = require('./routes/user');
 
+// utilisation de path pour accéder au chemins des fichiers
 const path = require('path');
 
 //package pour faciliter les interaction avec MongoDB
