@@ -1,5 +1,7 @@
 // import du modèle pour les sauces
-const Sauce = require("../models/modelsSauce"); //Importation du modèle de sauce
+const Sauce = require("../models/modelsSauce"); 
+// utilisation du package fs
+const fs = require("fs"); 
 
 
 // création d'une sauce
@@ -60,13 +62,14 @@ exports.deleteSauce = (req, res, next) => {
     Sauce.findOne({ _id: req.params.id }) 
         .then((sauce) => {
             const filename = sauce.imageUrl.split("/images/")[1];
+            // utilisation de la function unlink du pack fs pour supprimer le fichier et fire le callback une fois fichier suppr
             fs.unlink(`images/${filename}`, () => {
                 Sauce.deleteOne({ _id: req.params.id }) 
                     .then(() => res.status(200).json({ message: `Sauce supprimée !` }))
                     .catch((error) => res.status(500).json({ error }));
             });
         })
-        .catch((error) => res.status(500).json({ error }));
+        .catch((error) => res.status(400).json({ error }));
 };
 
 
