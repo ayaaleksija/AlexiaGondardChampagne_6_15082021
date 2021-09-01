@@ -10,7 +10,7 @@ const multer = require('../middleware/multer-config');
 
 // on relie les routes aux controllers créés
 router.post('/', auth, multer, sauceCtrl.createSauce);
-router.post("/:id/like", auth, sauceCtrl.likeDislikeSauce);
+router.post('/:id/like', auth, sauceCtrl.likeDislikeSauce);
 router.get('/:id', auth, sauceCtrl.getOneSauce);
 router.get('/', auth, sauceCtrl.getAllSauces);
 router.put('/:id', auth, multer, sauceCtrl.modifySauce);

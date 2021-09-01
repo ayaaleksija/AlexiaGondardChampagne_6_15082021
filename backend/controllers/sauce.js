@@ -3,6 +3,8 @@ const Sauce = require("../models/modelsSauce");
 // utilisation du package fs
 const fs = require("fs"); 
 
+const parseJwt = require("../utils/parseJwt");
+
 
 // création d'une sauce
 exports.createSauce = (req, res, next) => {
@@ -79,6 +81,12 @@ exports.likeDislikeSauce = (req, res, next) => {
     const userId = req.body.userId;
     const sauceId = req.params.id;
     const like = req.body.like;
+    const jwtUserId = parseJwt(req.headers.authorization.split(" ")[1]).userId;
+
+    // vérification de l'user ID correspond à celui connecté au token
+    if (userId !== jwtUserId){
+        res.status(403).json({ message: `utilisateur non autorisé` })
+    }
 
         //Définit le statut de like (1,-1,0,defaut)
         switch (like) {

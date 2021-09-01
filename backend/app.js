@@ -1,10 +1,6 @@
 // import framework Express pour node.js
 const express = require('express');
 
-// package qui nous permettra de gérer la demande POST venant du FE
-// extraction de l'objet JSON de la demande
-const bodyParser= require('body-parser');
-
 // création des constantes pour importer les routes créées
 const sauceRoutes = require('./routes/sauces');
 const userRoutes = require('./routes/user');
@@ -16,10 +12,18 @@ const path = require('path');
 // import du package
 const mongoose = require('mongoose');
 
+const mongoSanitize = require('express-mongo-sanitize');
+
+// import d'helmet pour sécuriser les entetes requetes
+const helmet = require("helmet");
+
+// créé un environnement avec des variables confidentielles
+require('dotenv').config();
+
 // Connexion de l'API à MongoDB grace au package mongoose
-mongoose.connect('mongodb+srv://ayaaleksija:Xeui3pfx@cluster0.njv0z.mongodb.net/Cluster0?retryWrites=true&w=majority',
+mongoose.connect(process.env.MONGO_DB,
   { useNewUrlParser: true,
-    useUnifiedTopology: true })
+  useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
   .catch(() => console.log('Connexion à MongoDB échouée !'));
 
@@ -38,11 +42,16 @@ app.use((req, res, next) =>{
     next();
 });
 
+// remplace bodyparser et recupere requetes au format json
+app.use(express.json());
+
+// utilisation du package pour la protection contre les injections SQL
+app.use(mongoSanitize());
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
-// transforme les données des requetes post en json
-app.use(bodyParser.json());
+//applique le plugin helmet
+app.use(helmet());
 
 // utilisation des routes vers les sauces
 app.use('/api/sauces', sauceRoutes);
